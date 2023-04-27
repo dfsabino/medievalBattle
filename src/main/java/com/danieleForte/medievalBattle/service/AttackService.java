@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 public class AttackService {
 
     @Autowired
-    private static PlayDice playDice;
+    private static PlayDice playDice = new PlayDice();
+
+    @Autowired
     private BattleTurnRepository repository;
+
+    @Autowired
     private BattleCharacterRepository battleCharacterRepository;
 
     public BattleTurn attack(TurnInfo turnInfo ) {
@@ -29,6 +33,7 @@ public class AttackService {
         if(bt!=null) {
             battleTurn.setTypeAction(TypeAction.ATTACK);
             battleTurn.setBattleCharacter(bt);
+
             battleTurn.setTurnValue(response.getSumDices() + bt.getStrength() + bt.getAgility());
             battleTurn.setFinishBattle(false);
             battleTurn.setResultDice(response.getSumDices());
@@ -37,7 +42,7 @@ public class AttackService {
     }
     public static HistoryPlayDice getDiceAttackResult()
     {
-        return playDice.getDiceResult(1, 12);
+        return playDice.getDiceResult(12, 1);
     }
 
 }

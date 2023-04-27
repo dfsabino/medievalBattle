@@ -34,7 +34,7 @@ public class BattleTurnService {
 
     public BattleTurn getLastDefenseByBattleId(long id ) {
 
-        return repository.getLastDefenseByBattleId( id ) .orElseThrow( ( ) -> new ResourceNotFoundException(
+        return repository.getLastDefenseByBattleId( id ).orElseThrow( ( ) -> new ResourceNotFoundException(
                 "Character not found with ID: " + id ) );
     }
 
@@ -42,8 +42,7 @@ public class BattleTurnService {
         return repository.findAll( );
     }
 
-    public int getQtdTurn(long id ) {
-
-        return repository.getQtdTurn( id );
+    public int getQtdTurn(long battleId ) {
+        return repository.getQtdTurn( battleId );
     }
 }

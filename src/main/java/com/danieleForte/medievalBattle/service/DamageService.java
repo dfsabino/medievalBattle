@@ -15,41 +15,56 @@ public class DamageService {
 
     @Autowired
     private static PlayDice playDice = new PlayDice();
+
+    @Autowired
     private BattleTurnService service;
+
+    @Autowired
     private BattleService battleService;
+
+    @Autowired
     private CharacterRepository characterRepository;
-    private BattleCharacterRepository battleCharacterRepository;
+
+    @Autowired
+    private BattleCharacterService battleCharacterService;
 
     public BattleTurn damage(TurnInfo turnInfo ) {
         Character character = new Character();
         BattleTurn battleTurn = new BattleTurn();
         BattleTurn battleTurnDefense = new BattleTurn();
-        BattleCharacter bt = new BattleCharacter();
-        bt =  battleCharacterRepository.findById(turnInfo.getCharacterBattleId()).orElseThrow( ( ) -> new ResourceNotFoundException(
-                "Character not found with ID: " + turnInfo.getCharacterBattleId() ) );
+        BattleCharacter battlecaCharacter = new BattleCharacter();
+        battlecaCharacter =  battleCharacterService.findById(turnInfo.getCharacterBattleId());
 
-        if(bt!=null) {
-            BattleCharacter finalBt = bt;
-            character = characterRepository.findById(bt.getCharacter().getId()).orElseThrow( ( ) -> new ResourceNotFoundException(
-                    "Character not found with ID: " + finalBt.getCharacter().getId()));
+        if(battlecaCharacter!=null) {
 
+            long idBattleCharacter = battlecaCharacter.getId();
+            character = characterRepository.findById(battlecaCharacter.getCharacter().getId()).orElseThrow( ( ) -> new ResourceNotFoundException(
+                    "Character not found with ID: " + idBattleCharacter));
+            System.out.println("character: "+character);
             HistoryPlayDice response = playDice.getDiceResult(character.getFaceDice(), character.getQuantityDice());
 
             battleTurnDefense = service.getLastDefenseByBattleId(turnInfo.getBattleId());
             battleTurn.setTypeAction(TypeAction.DAMAGE);
-            battleTurn.setBattleCharacter(bt);
-            int resultDamage = response.getSumDices() + bt.getStrength();
+            battleTurn.setBattleCharacter(battlecaCharacter);
+            int resultDamage = response.getSumDices() + battlecaCharacter.getStrength();
 
-            if(resultDamage >= bt.getHitPoint())
-                bt.setHitPoint(bt.getHitPoint()-resultDamage);
+            System.out.println("Damage: "+resultDamage);
+            System.out.println("Soma dados: "+response.getSumDices());
 
-            if(bt.getHitPoint()<=0) {
+
+            battlecaCharacter.setHitPoint(battlecaCharacter.getHitPoint()-resultDamage);
+
+
+            System.out.println(battlecaCharacter);
+
+            if(battlecaCharacter.getHitPoint()<=0) {
                 battleTurn.setFinishBattle(true);
                 BattleTurn battleTurnAttack = service.getLastAttackByBattleId(turnInfo.getBattleId());
                 Battle battle = battleService.findById(turnInfo.getBattleId());
                 battle.setCharacterWin(battleTurn.getBattleCharacter().getId());
-                int qtdTurn = service.getQtdTurn(battleTurn.getId());
+                int qtdTurn = service.getQtdTurn(battlecaCharacter.getBattle().getId());
                 battle.setQuantityTurn(qtdTurn);
+                battleService.update(battle);
             }
             else
             {
@@ -60,7 +75,7 @@ public class DamageService {
 
             battleTurn.setResultDice(response.getSumDices());
         }
-
-        return service.update( battleTurn );
+        battleCharacterService.update(battlecaCharacter);
+        return service.create( battleTurn );
     }
 }

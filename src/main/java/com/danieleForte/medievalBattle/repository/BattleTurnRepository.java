@@ -54,4 +54,12 @@ public interface BattleTurnRepository extends JpaRepository<BattleTurn, Long > {
                 WHERE b.BATTLE_ID = ?1    
             """,nativeQuery = true)
     public int getQtdTurn(long battleId);
+
+    @Query(value ="""
+            select count(b.BATTLE_ID ) as amount from BATTLE_TURN a
+                inner join BATTLE_CHARACTER bc on bc.BATTLE_CHARACTER_ID =a.BATTLE_CHARACTER_ID
+                inner join Battle b on b.BATTLE_ID = bc.BATTLE_ID
+             WHERE b.BATTLE_ID = ?1
+            """,nativeQuery = true)
+    public Optional<Integer> getExistInitiative(long battleId);
 }

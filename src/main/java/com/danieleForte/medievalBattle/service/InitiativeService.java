@@ -27,9 +27,12 @@ public class InitiativeService {
     private BattleCharacterRepository battleCharacterRepository;
 
     public BattleTurn initiative(TurnInfo turnInfo ) {
-
         BattleTurn battleTurn = new BattleTurn();
-        List<BattleCharacter> listCharacterBattle;
+        List<BattleCharacter> listCharacterBattle = new ArrayList<>();
+
+        if(validateExistInitiative(turnInfo.getBattleId())>0)
+            return new BattleTurn();
+
         listCharacterBattle =  battleCharacterRepository.getCharacterBattleByBattleId(turnInfo.getBattleId()).orElseThrow( ( ) -> new ResourceNotFoundException(
                 "Character not found with ID: " + turnInfo.getBattleId() ) );
 
@@ -42,7 +45,14 @@ public class InitiativeService {
             battleTurn.setTypeAction(TypeAction.INITIATIVE);
             battleTurn.setFinishBattle(false);
         }
-        return repository.save( battleTurn );
+
+            return repository.save( battleTurn );
+    }
+
+    private Integer validateExistInitiative(long battleId)
+    {
+        return repository.getExistInitiative(battleId).orElseThrow( ( ) -> new ResourceNotFoundException(
+                "There is already initiative for this battle ID: " + battleId) );
     }
 
     private BattleTurn getWinBattleCharacter(List<BattleCharacter> listCharacterBattle)

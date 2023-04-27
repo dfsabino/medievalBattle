@@ -23,7 +23,11 @@ public class PlayDice {
         }
 
         hDice.setSumDices(sum);
+
+        System.out.println("Dices:" + hDice.getSumDices());
         hDice.setDices(dices);
+
+        System.out.println("Dices array:" +hDice.getDices());
         return hDice;
     }
 

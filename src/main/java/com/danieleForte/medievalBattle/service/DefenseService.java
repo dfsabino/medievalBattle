@@ -40,6 +40,7 @@ public class DefenseService {
             battleTurn.setTypeAction(TypeAction.DEFENSE);
             battleTurn.setBattleCharacter(bt);
             int resultDefense = response.getSumDices() + bt.getDefense() + bt.getAgility();
+
             if(battleTurnAttack.getTurnValue() > resultDefense)
                 battleTurn.setReceivedDamage(true);
 
@@ -53,6 +54,6 @@ public class DefenseService {
 
     public static HistoryPlayDice getDiceDefenseResult()
     {
-        return playDice.getDiceResult(1, 12);
+        return playDice.getDiceResult(12, 1);
     }
 }
